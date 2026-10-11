@@ -1,0 +1,107 @@
+# Basic Application Profiles from IEC TR 61850-7-6 Ed. 2.0 (2024-12), Annexes A and C, read from the
+# page images of the licensed copy (reference only). Facts only: variants, actors and, per data
+# object, the attributes and the variants in which the TR marks it R (required as server
+# capability) or Rc (required as client capability). Variant meanings are in our words.
+# Where the TR is ambiguous, the reading chosen is a finding F-786 to F-790 (see PROVENANCE.md).
+# `asd` names the IEC TR 61850-7-6 ASD example (IEC file 2024A2, loaded with model.LoadNSD) that
+# carries the profile's application template: the model loads it, checks it against the 7-4 NSD
+# and compares every item below with it (BAP.TemplateDepartures; the ASD templates are minimal
+# data models without the variant and R/Rc tables, which stay read from the TR text).
+baps:
+  - name: reverse-blocking
+    title: Reverse blocking of the infeed overcurrent protection by the outflow bays
+    source: "IEC TR 61850-7-6:2024 Annex A"
+    asd: "Reverse Blocking_0_1.asd"
+    variantGroups:
+      - name: F
+        kind: core
+        variants:
+          - {name: FA, meaning: "settings outside IEC 61850; blocking signal wired"}
+          - {name: FB, meaning: "configured through IEC 61850; blocking signal by GOOSE"}
+      - name: M
+        kind: noncore
+        variants:
+          - {name: MA, meaning: "no monitoring"}
+          - {name: MB, meaning: "monitoring of operate and pickup"}
+      - name: T
+        kind: noncore
+        variants:
+          - {name: TA, meaning: "test outside the required features"}
+          - {name: TB, meaning: "test is a required feature"}
+    actors:
+      - name: blocked
+        meaning: "infeed bay protection that is blocked"
+        table: "A.1"
+        items:
+          - {ln: PTOC, do: Mod, cdc: ENC, attrs: [stVal], values: "test, test/blocked, blocked", r: [TB]}
+          - {ln: PTOC, do: Str, cdc: ACD, attrs: [general, q, t], r: [FB]}
+          - {ln: PTOC, do: Op, cdc: ACT, attrs: [general, q, t], r: [FB, MB]}
+          - {ln: PTOC, do: Blk, cdc: SPS, attrs: [stVal, q, t], r: [MB]}
+          - {ln: PTOC, do: OpDlTmms, cdc: ING, attrs: [setVal], values: "100 ms, 1 s", r: [FB]}
+          - {ln: PTOC, do: BlkRef, cdc: ORG, attrs: [setSrcRef], multi: true, r: [FB]}
+      - name: blocking
+        meaning: "outflow bay protection that sends the blocking pickup"
+        table: "A.2"
+        items:
+          - {ln: PTOC, do: Mod, cdc: ENC, attrs: [stVal], values: "test, test/blocked, blocked", r: [TB]}
+          - {ln: PTOC, do: Str, cdc: ACD, attrs: [general, q, t], r: [FB]}
+          - {ln: PTOC, do: Op, cdc: ACT, attrs: [general, q, t], r: [FB, MB]}
+          - {ln: PTOC, do: OpDlTmms, cdc: ING, attrs: [setVal], values: "100 ms", r: [FB]}
+      - name: monitoring
+        meaning: "client that monitors the reverse blocking"
+        table: "A.3"
+        items:
+          - {ln: PTOC, do: Mod, cdc: ENC, attrs: [stVal], values: "test, test/blocked, blocked", rc: [TB]}
+          - {ln: PTOC, do: Str, cdc: ACD, attrs: [general, q, t], rc: [MB, TB]}
+          - {ln: PTOC, do: Op, cdc: ACT, attrs: [general, q, t], rc: [MB, TB]}
+          - {ln: PTOC, do: Blk, cdc: SPS, attrs: [stVal, q, t], rc: [MB, TB]}
+  - name: line-distance-protection
+    title: Line distance protection
+    source: "IEC TR 61850-7-6:2024 Annex C"
+    asd: "Line distance protection_0_1.asd"
+    variantGroups:
+      - name: F
+        kind: core
+        variants:
+          - {name: FA, meaning: "station bus only; CT/VT and breaker wired"}
+          - {name: FB, meaning: "process bus: sampled values and trip GOOSE"}
+      - name: TP
+        kind: noncore
+        variants:
+          - {name: TPA, meaning: "no teleprotection scheme"}
+          - {name: TPB, meaning: "blocking scheme, receive and send"}
+          - {name: TPC, meaning: "permissive underreach scheme"}
+          - {name: TPD, meaning: "permissive overreach scheme"}
+      - name: T
+        kind: noncore
+        variants:
+          - {name: TA, meaning: "test not based on IEC 61850"}
+          - {name: TB, meaning: "test based on IEC 61850"}
+      - name: S
+        kind: noncore
+        variants:
+          - {name: SA, meaning: "settings preconfigured"}
+          - {name: SB, meaning: "settings through IEC 61850 services"}
+    actors:
+      - name: distance-protection
+        meaning: "IED hosting the distance protection"
+        table: "C.1"
+        items:
+          - {ln: LLN0, do: Health, cdc: ENS, attrs: [stVal, q, t], r: [TPA, TPB, TPC, TPD, TA, TB, SA, SB]}
+          - {ln: LLN0, do: Mod, cdc: ENC, attrs: [origin, ctlNum, stVal, q, t, ctlModel, sboTimeout, sboClass, operTimeout], r: [TPA, TPB, TPC, TPD, TA, SA, SB]}
+          - {ln: LLN0, do: Beh, cdc: ENS, attrs: [stVal, q, t], r: [TPA, TPB, TPC, TPD, TA, SA, SB]}
+          - {ln: PDIS, inst: "1", do: Op, cdc: ACT, attrs: [general, phsA, phsB, phsC, neut, q, t], r: [TPA, TPB, TPC, TPD, TA, TB, SA, SB]}
+          - {ln: PDIS, inst: "1", do: Str, cdc: ACD, attrs: [general, dirGeneral, q, t], r: [TPA, TPB, TPC, TPD, TA, TB, SA, SB]}
+          - {ln: PDIS, inst: "2", do: Op, cdc: ACT, attrs: [general, phsA, phsB, phsC, neut, q, t], r: [TPA, TPB, TPC, TPD, TA, TB, SA, SB]}
+          - {ln: PDIS, inst: "2", do: Str, cdc: ACD, attrs: [general, dirGeneral, q, t], r: [TPA, TPB, TPC, TPD, TA, TB, SA, SB]}
+          - {ln: PDIS, inst: "3", do: Op, cdc: ACT, attrs: [general, phsA, phsB, phsC, neut, q, t], r: [TPA, TPB, TPC, TPD, TA, TB, SA, SB]}
+          - {ln: PDIS, inst: "3", do: Str, cdc: ACD, attrs: [general, dirGeneral, q, t], r: [TPA, TPB, TPC, TPD, TA, TB, SA, SB]}
+          - {ln: PSCH, do: EchoWei, cdc: SPS, attrs: [stVal, q, t], r: [TPA, TA, TB, SA, SB]}
+          - {ln: PSCH, do: TxPrm, cdc: ACT, attrs: [general, q, t], r: [TPA, TPB, TA, TB, SA, SB]}
+          - {ln: PSCH, do: RxPrm, cdc: ACT, attrs: [general, q, t], multi: true, r: [TPA, TPB, TA, TB, SA, SB]}
+          - {ln: PSCH, do: TxBlk, cdc: ACT, attrs: [general, q, t], r: [TPA, TPC, TPD, TA, TB, SA, SB]}
+          - {ln: PSCH, do: RxBlk, cdc: ACT, attrs: [general, q, t], multi: true, r: [TPA, TPC, TPD, TA, TB, SA, SB]}
+          - {ln: PSCH, do: Op, cdc: ACT, attrs: [general, q, t], r: [TPA, TA, TB, SA, SB]}
+          - {ln: PTRC, do: Op, cdc: ACT, attrs: [general, phsA, phsB, phsC, neut, q, t], r: [TPA, TPB, TPC, TA, TB, SA, SB]}
+          - {ln: PTRC, do: Str, cdc: ACD, attrs: [general, dirGeneral, q, t], r: [TPA, TPB, TPC, TA, TB, SA, SB]}
+          - {ln: PTRC, do: Tr, cdc: ACT, attrs: [general, phsA, phsB, phsC, neut, q, t], r: [TPA, TPB, TPC, TA, TB, SA, SB]}

@@ -1,0 +1,84 @@
+iec61850 (IEC 61850 MMS client, data model, SCL, GOOSE and sampled values,
+and ICCP / TASE.2, in Go)
+Copyright 2026 Abhinav Gautam
+
+This module is licensed under the Apache License, Version 2.0 (LICENSE).
+Every file in it is under that licence.
+
+The code was written for SigmaM2M, a oneM2M platform, from the standards
+listed in PROVENANCE.md. It contains no code from other projects. The
+source files that come from SigmaM2M carry no per-file copyright header
+(the convention of the code they come from); the copyright line above
+covers them. Files added for this module carry "Copyright 2026 Abhinav
+Gautam" and "SPDX-License-Identifier: Apache-2.0".
+
+IEC material is not included
+----------------------------
+
+IEC publishes machine-readable files for IEC 61850 under its own licence:
+the name space definitions (NSD) of IEC 61850-7-2, -7-3, -7-4 and -8-1,
+the application templates (ASD) of IEC TR 61850-7-6 and the SCL schema of
+IEC 61850-6. This module does not include any of them, nor anything
+generated from them. An application that wants the IEC 61850 model or
+schema validation loads IEC's files at run time (model.LoadNSD,
+scl.LoadSchema), from copies it obtained from IEC under IEC's terms.
+No text of the standards is reproduced either: comments cite clause,
+table and annex numbers in our own words, and names, codes, tags, octet
+layouts and values are used as facts.
+
+Specifications
+--------------
+
+IEC 61850 (parts 6, 7-1 to 7-4, 7-6, 8-1, 9-2), IEC 62351 (parts 3, 4, 6,
+8, 9), IEC 60870-6 (parts 503, 702, 802), ISO 9506-1/-2 (MMS), ISO 8073,
+ISO 8327-1, ISO 8823-1, ISO 8650-1, ITU-T X.690 and the RFCs in
+PROVENANCE.md were read in licensed copies or as published.
+
+Trademarks
+----------
+
+IEC is a trademark of the International Electrotechnical Commission. ISO
+is a trademark of the International Organization for Standardization.
+Standard numbers and product names (IEC 61850, MMS, ICCP, TASE.2,
+libiec61850, MZ Automation) are used only to say what this module
+implements or was tested against. This module is not affiliated with,
+endorsed or certified by IEC, ISO, UCA International Users Group, MZ
+Automation or any vendor; it makes no conformance claim.
+
+Dependencies
+------------
+
+- github.com/cB-Sigma/iotsec (Apache-2.0, Copyright 2026 Abhinav Gautam):
+  the security seams.
+- github.com/cB-Sigma/iotcrypto (Apache-2.0, Copyright 2026 Abhinav
+  Gautam; its bigmod package, used here, is BSD-3-Clause, Copyright 2009
+  The Go Authors and 2026 Abhinav Gautam, as its NOTICE lists): KMAC
+  (kmac) and constant-time modular arithmetic (bigmod).
+- github.com/cB-Sigma/xsd (Apache-2.0, Copyright 2026 Abhinav Gautam):
+  XML Schema validation of SCL against a schema the application loads.
+- golang.org/x/text (BSD-3-Clause, Copyright 2009 The Go Authors):
+  character encodings of SCL files.
+- golang.org/x/net (BSD-3-Clause, Copyright 2009 The Go Authors): TTL and
+  DSCP of routable GOOSE (ipv4).
+- golang.org/x/sys (BSD-3-Clause, Copyright 2009 The Go Authors):
+  indirect, through golang.org/x/net.
+- gopkg.in/yaml.v3 (Apache-2.0, Copyright (c) 2011-2019 Canonical Ltd;
+  the files ported from libyaml are MIT, Copyright (c) 2006-2011 Kirill
+  Simonov): the model's supplement files.
+- The Go standard library (BSD-3-Clause, Copyright The Go Authors).
+
+Test data
+---------
+
+scl/testdata/bay.scd is this module's own test system. Tests use octet
+examples of IEC 61850-8-1 Annexes A and C and IEC 61850-9-2 as test
+vectors (values, not text). Tests that need IEC's machine-readable files
+or SCL files built around the standard's examples read them from the
+directories named by IEC61850_CODE_COMPONENTS, IEC61850_DESCRIPTIONS and
+IEC61850_SCL_TESTDATA, and are skipped when these are not set. Every
+certificate, key, password, address and value in the tests and examples
+is generated or a made-up demo value.
+
+The nested test-only module interop/ runs this module against
+libiec61850 (GPLv3, MZ Automation) built inside Docker containers at test
+time. No libiec61850 code is included in this module or linked into it.

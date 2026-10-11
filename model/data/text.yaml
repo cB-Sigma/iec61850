@@ -1,0 +1,151 @@
+# Supplement to the IEC 61850 model, which is built from IEC's NSD files loaded at run time
+# (model.LoadNSD; this module does not carry them). The NSD "Light" edition has names and
+# structure only. What the model needs in words, and the few 7-2 types the NSD does not define,
+# is kept here, as facts and in our own words:
+#   - meanings of functional constraints, presence conditions and LN groups: our own words;
+#   - cdcKinds: the grouping of the common data classes by IEC 61850-7-3 Clause 7 subclause;
+#   - typeNames: the IEC 61850-7-2 Ed. 2.1 type names this package has always used for the NSD
+#     basic types (the NSD keeps the Ed. 2 names Dbpos, Tcmd, ObjRef, ...);
+#   - types72 / enums72: IEC 61850-7-2 Ed. 2.1 packed types and kinds the NSD leaves as basic
+#     types (Quality, Timestamp, TimeQuality, CheckConditions, DpStatusKind, StepControlKind,
+#     ValidityKind, SourceKind), with IEC 61850-8-1 Ed. 2.1 bit positions.
+# LN class titles and abbreviation meanings are not here (they would come from the standard's
+# text); an application that has them passes them to model.SetDescriptions.
+# Every key is checked against the loaded NSD tables when the model is built.
+
+functionalConstraints:
+  ST: "status"
+  MX: "measurand"
+  SP: "setting outside setting groups"
+  SV: "substitution"
+  CF: "configuration"
+  DC: "description"
+  SG: "setting group (active)"
+  SE: "setting group (edit)"
+  SR: "service response / tracking"
+  OR: "operate received"
+  BL: "blocking"
+  EX: "extended definition (name spaces)"
+  CO: "control (Oper, SBOw, Cancel)"
+  US: "unicode string"
+  MS: "multicast sampled value control"
+  RP: "unbuffered report control"
+  BR: "buffered report control"
+  LG: "log control"
+  GO: "GOOSE control"
+# Functional constraints of control blocks and other services (IEC 61850-8-1 Ed. 2.1 Clause 9),
+# not in the NSD files (the 8-1 SNSD history notes their removal); used in references.
+extraFunctionalConstraints: [US, MS, RP, BR, LG, GO]
+presenceConditions:
+  M: "mandatory"
+  O: "optional"
+  F: "forbidden"
+  na: "not applicable"
+  Mmulti: "one or more instances, numbered from 1"
+  Omulti: "zero or more instances, numbered from 1"
+  AtLeastOne: "at least one element of group n"
+  AtMostOne: "at most one of the marked elements"
+  AllOrNonePerGroup: "all elements of group n or none"
+  AllOnlyOneGroup: "all elements of exactly one group"
+  AllAtLeastOneGroup: "all elements of at least one group"
+  MF: "mandatory if the sibling exists, else forbidden"
+  MO: "mandatory if the sibling exists, else optional"
+  OM: "optional if the sibling exists, else mandatory"
+  FM: "forbidden if the sibling exists, else mandatory"
+  MOcond: "mandatory if the textual condition n holds, else optional"
+  MFcond: "mandatory if the textual condition n holds, else forbidden"
+  OFcond: "optional if the textual condition n holds, else forbidden"
+  MmultiRange: "one or more instances numbered within min..max"
+  OmultiRange: "zero or more instances numbered within min..max"
+  MFsubst: "mandatory when substitution is supported, else forbidden"
+  MOln0: "mandatory in LLN0, else optional"
+  MFln0: "mandatory in LLN0, else forbidden"
+  MOlnNs: "mandatory when the LN name space differs from the LD one"
+  MOdataNs: "mandatory when the DO name space differs from the LN one"
+  MFscaledAV: "mandatory when a sibling AnalogueValue carries i, else forbidden"
+  MFscaledMagV: "mandatory when a sibling Vector magnitude carries i"
+  MFscaledAngV: "mandatory when a sibling Vector angle carries i"
+  MOrms: "mandatory when hvRef is rms"
+  MOrootLD: "mandatory in a root logical device"
+  MOoperTm: "mandatory when a controlled object of the IED supports time activated operate"
+  MmultiF: "one or more instances if the sibling exists, else forbidden"
+  MOsbo: "mandatory when the control model is select-before-operate"
+  MOenhanced: "mandatory when the control model uses enhanced security"
+  MONamPlt: "mandatory when the LN name space differs from the LD one"
+  OF: "optional if the sibling exists, else forbidden"
+  MORange: "mandatory when the range (or rangeAng) attribute exists"
+  OMSynPh: "optional when phsRef is Synchrophasor, else mandatory"
+  MAllOrNonePerGroup: "mandatory with enhanced security control models, else all or none of group n"
+  MOctrl: "mandatory when the control model is other than status-only, else optional"
+  MOsboNormal: "mandatory when the control model is sbo-with-normal-security, else optional"
+  MOsboEnhanced: "mandatory when the control model is sbo-with-enhanced-security, else optional"
+groups:
+  L: "system logical nodes"
+  A: "automatic control"
+  C: "supervisory control"
+  F: "functional blocks"
+  G: "generic references"
+  I: "interfacing and archiving"
+  K: "mechanical and non-electrical primary equipment"
+  M: "metering and measurement"
+  P: "protection functions"
+  Q: "power quality events detection"
+  R: "protection related functions"
+  S: "supervision and monitoring"
+  T: "instrument transformers and sensors"
+  X: "switchgear"
+  Y: "power transformers and related functions"
+  Z: "further power system equipment"
+cdcKinds:
+  status: [SPS, DPS, INS, ENS, ACT, ACD, SEC, BCR, HST, VSS, ORS, TCS]
+  measurand: [MV, CMV, SAV, WYE, DEL, SEQ, HMV, HWYE, HDEL]
+  controllable: [SPC, DPC, INC, ENC, BSC, ISC, APC, BAC]
+  statusSetting: [SPG, ING, ENG, ORG, TSG, CUG, VSG]
+  analogueSetting: [ASG, CURVE, CSG]
+  description: [DPL, LPL, CSD, VSD]
+  serviceTracking: [CST, BTS, UTS, LTS, GTS, MTS, NTS, STS, CTS]
+typeNames: {Dbpos: DpStatusKind, Tcmd: StepControlKind, ObjRef: ObjectReference, Check: CheckConditions, TrgOps: TriggerConditions, OptFlds: RCBReportOptions, SvOptFlds: SVMessageOptions}
+# Basic types used by the supplement's own types, or by 7-3 attributes with a type the 7-2 NSD does not list.
+basicTypes: [INT24, INT24U, FLOAT64, VisString32, VisString65, EnumDA, DA]
+types72:
+  - name: Quality
+    source: "IEC 61850-7-2 Ed2.1 6.2 (bit positions: IEC 61850-8-1 Ed2.1 8.2)"
+    packed: "BIT STRING(13)"
+    attrs:
+      - {name: "validity", type: ValidityKind, bits: "0-1"}
+      - {name: "detailQual.overflow", type: BOOLEAN, bits: "2"}
+      - {name: "detailQual.outOfRange", type: BOOLEAN, bits: "3"}
+      - {name: "detailQual.badReference", type: BOOLEAN, bits: "4"}
+      - {name: "detailQual.oscillatory", type: BOOLEAN, bits: "5"}
+      - {name: "detailQual.failure", type: BOOLEAN, bits: "6"}
+      - {name: "detailQual.oldData", type: BOOLEAN, bits: "7"}
+      - {name: "detailQual.inconsistent", type: BOOLEAN, bits: "8"}
+      - {name: "detailQual.inaccurate", type: BOOLEAN, bits: "9"}
+      - {name: "source", type: SourceKind, bits: "10"}
+      - {name: "test", type: BOOLEAN, bits: "11"}
+      - {name: "operatorBlocked", type: BOOLEAN, bits: "12"}
+  - name: Timestamp
+    source: "IEC 61850-7-2 Ed2.1 6.1.2.9"
+    attrs:
+      - {name: "SecondSinceEpoch", type: INT32U}
+      - {name: "FractionOfSecond", type: INT24U}
+      - {name: "TimeQuality", type: TimeQuality}
+  - name: TimeQuality
+    source: "IEC 61850-7-2 Ed2.1 6.1.2.9; 8-1 8.1.3.7"
+    packed: "octet"
+    attrs:
+      - {name: "LeapSecondsKnown", type: BOOLEAN, bits: "0"}
+      - {name: "ClockFailure", type: BOOLEAN, bits: "1"}
+      - {name: "ClockNotSynchronized", type: BOOLEAN, bits: "2"}
+      - {name: "TimeAccuracy", type: INT8U, bits: "3-7"}
+  - name: CheckConditions
+    source: "IEC 61850-7-2 Ed2.1 20.2.2"
+    packed: "BIT STRING(2)"
+    attrs:
+      - {name: "synchrocheck", type: BOOLEAN, bits: "0"}
+      - {name: "interlock-check", type: BOOLEAN, bits: "1"}
+enums72:
+  - {name: ValidityKind, source: "7-2", clause: "6.2 (Table 26)", items: [{name: "good", value: 0}, {name: "invalid", value: 1}, {name: "reserved", value: 2}, {name: "questionable", value: 3}]}
+  - {name: SourceKind, source: "7-2", clause: "6.2", items: [{name: "process", value: 0}, {name: "substituted", value: 1}]}
+  - {name: DpStatusKind, source: "7-2", clause: "6.4 (Table 24)", items: [{name: "intermediate-state", value: 0}, {name: "off", value: 1}, {name: "on", value: 2}, {name: "bad-state", value: 3}]}
+  - {name: StepControlKind, source: "7-2", clause: "6.4 (Table 23)", items: [{name: "stop", value: 0}, {name: "lower", value: 1}, {name: "higher", value: 2}, {name: "reserved", value: 3}]}
